@@ -1,0 +1,44 @@
+{
+  "exec": {
+    "cwd": "${configDir}",
+
+    "commands": [
+      /*
+      TODO: Does not work on Windows,
+      as dprint does not support resolving anything but .exe's
+      and Dart's CLI is provided as a .bat file.
+
+      See: https://github.com/dprint/dprint-plugin-exec/issues/25
+
+      {
+        "command": "dart format",
+        "exts": ["dart"],
+      },
+      */
+      {
+        "command": "java -jar .tools/bin/ktfmt.jar --kotlinlang-style -",
+        "exts": ["kt", "kts"],
+      },
+      {
+        "command": "java -jar .tools/bin/google-java-format.jar --aosp -",
+        "exts": ["java"],
+      },
+    ],
+  },
+  "excludes": [
+    "",
+  ],
+  "plugins": [
+    "https://plugins.dprint.dev/json-0.20.0.wasm",
+    "https://plugins.dprint.dev/markdown-0.18.0.wasm",
+    /*
+    TODO: Wait for XML and SVG support
+
+    See:https://github.com/g-plane/markup_fmt/issues/119
+
+    "https://plugins.dprint.dev/g-plane/markup_fmt-v0.20.0.wasm",
+    */
+    "https://plugins.dprint.dev/g-plane/pretty_yaml-v0.5.1.wasm",
+    "https://plugins.dprint.dev/exec-0.5.1.json@492414e39dea4dccc07b4af796d2f4efdb89e84bae2bd4e1e924c0cc050855bf",
+  ],
+}

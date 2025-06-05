@@ -18,3 +18,5 @@ It is based on Material 3 and has beautiful built-in dark and light themes.
 ## Getting Started
 
 This application is built using the [Flutter](https://flutter.dev/) framework. To get started, you will need to install Flutter on your machine. You can find instructions on how to do that [here](https://flutter.dev/docs/get-started/install).
+
+We use [`dprint`](https://dprint.dev) for formatting our code. It depends on the `dart` CLI being in your `PATH`, and a few more dependencies that can be installed with `dart run scripts/setup.dart`. After that, you can run `dprint check` to check if your code is formatted correctly, or `dprint fmt` to format it.
