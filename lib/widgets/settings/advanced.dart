@@ -19,28 +19,32 @@ class _PowerSettingsTileState extends ConsumerState<PowerSettingsTile> {
 
   @override
   void initState() {
-    powerLimit = ref
+    powerLimit =
+        ref
             .read(ironSettingsProvider)
             .settings
             ?.advancedSettings
             .powerLimit
             .toDouble() ??
         -1;
-    powerPulse = ref
+    powerPulse =
+        ref
             .read(ironSettingsProvider)
             .settings
             ?.advancedSettings
             .powerPulse
             .toDouble() ??
         -1;
-    powerPulseDelay = ref
+    powerPulseDelay =
+        ref
             .read(ironSettingsProvider)
             .settings
             ?.advancedSettings
             .powerPulseDelay ??
         Duration.zero;
 
-    powerPulseDuration = ref
+    powerPulseDuration =
+        ref
             .read(ironSettingsProvider)
             .settings
             ?.advancedSettings
@@ -74,14 +78,9 @@ class _PowerSettingsTileState extends ConsumerState<PowerSettingsTile> {
       title: const Text("Advanced settings"),
       subtitle: const Text("Tweak power and other settings."),
       expandedCrossAxisAlignment: CrossAxisAlignment.start,
-      childrenPadding: const EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 10,
-      ),
+      childrenPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       children: [
-        const Text(
-          "Power Limit",
-        ),
+        const Text("Power Limit"),
         const SizedBox(height: 10),
         // Slider
         Slider(
@@ -169,7 +168,8 @@ class _PowerSettingsTileState extends ConsumerState<PowerSettingsTile> {
                 return AlertDialog(
                   title: const Text("Restore Defaults"),
                   content: const Text(
-                      "Are you sure you want to restore the default settings?"),
+                    "Are you sure you want to restore the default settings?",
+                  ),
                   actions: [
                     TextButton(
                       onPressed: () {

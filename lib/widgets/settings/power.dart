@@ -23,10 +23,10 @@ class _PowerSettingsTileState extends ConsumerState<PowerSettingsTile> {
         ref.read(ironSettingsProvider).settings?.powerSettings.minVolCell ?? -1;
     qcMaxVolValue =
         ref.read(ironSettingsProvider).settings?.powerSettings.qCMaxVoltage ??
-            -1;
+        -1;
     pdNegotiationValue =
         ref.read(ironSettingsProvider).settings?.powerSettings.pdTimeout ??
-            const Duration(seconds: -1);
+        const Duration(seconds: -1);
     super.initState();
   }
 
@@ -42,7 +42,8 @@ class _PowerSettingsTileState extends ConsumerState<PowerSettingsTile> {
       qcMaxVolValue = ironS.settings?.powerSettings.qCMaxVoltage ?? -1;
     }
     if (pdNegotiationValue == const Duration(seconds: -1)) {
-      pdNegotiationValue = ironS.settings?.powerSettings.pdTimeout ??
+      pdNegotiationValue =
+          ironS.settings?.powerSettings.pdTimeout ??
           const Duration(seconds: -1);
     }
 
@@ -50,14 +51,9 @@ class _PowerSettingsTileState extends ConsumerState<PowerSettingsTile> {
       title: const Text("Power settings"),
       subtitle: const Text("Power Source, Voltages and PD settings."),
       expandedCrossAxisAlignment: CrossAxisAlignment.start,
-      childrenPadding: const EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 10,
-      ),
+      childrenPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       children: [
-        const Text(
-          "Power Source",
-        ),
+        const Text("Power Source"),
         const SizedBox(height: 10),
         ...PowerSource.values.map(
           (e) => RadioListTile<PowerSource>(

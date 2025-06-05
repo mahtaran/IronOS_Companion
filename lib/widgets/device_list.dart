@@ -21,35 +21,69 @@ class _DeviceListState extends ConsumerState<DeviceList> {
     final ironP = ref.watch(ironProvider.notifier);
     ironP.startScan();
     return StreamBuilder<List<ScanResult>>(
-        stream: ironP.scanResults,
-        builder: (context, snapshot) {
-          final numDev = snapshot.data?.length ?? 0;
-          if (numDev == 0) {
-            return const Column(
-              children: [
-                Text("No devices found"),
-              ],
-            );
-          } else if (numDev == 1) {
-            return Column(
-              children: [
-                const Text("Found IronOS device!"),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Card(
-                    child: ListTile(
-                      title: Text(snapshot.data![0].device.localName),
-                      subtitle:
-                          Text(snapshot.data![0].device.remoteId.toString()),
+      stream: ironP.scanResults,
+      builder: (context, snapshot) {
+        final numDev = snapshot.data?.length ?? 0;
+        if (numDev == 0) {
+          return const Column(children: [Text("No devices found")]);
+        } else if (numDev == 1) {
+          return Column(
+            children: [
+              const Text("Found IronOS device!"),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Card(
+                  child: ListTile(
+                    title: Text(snapshot.data![0].device.platformName),
+                    subtitle: Text(
+                      snapshot.data![0].device.remoteId.toString(),
                     ),
                   ),
                 ),
-                // Connect Button
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    !inProgress
-                        ? OutlinedButton(
+              ),
+              // Connect Button
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  !inProgress
+                      ? OutlinedButton(
+                          onPressed: () async {
+                            setState(() {
+                              inProgress = true;
+                            });
+                            await ref
+                                .read(ironProvider.notifier)
+                                .connect(snapshot.data![0].device);
+                            if (context.mounted) {
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                  builder: (context) => const SolderPage(),
+                                ),
+                              );
+                            }
+                          },
+                          child: const Text("Connect To Device"),
+                        )
+                      : const CircularProgressIndicator(),
+                ],
+              ),
+            ],
+          );
+        } else {
+          return Column(
+            children: [
+              Text("Found $numDev IronOS devices!"),
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: numDev,
+                itemBuilder: (context, index) {
+                  final device = snapshot.data![index].device;
+                  return ListTile(
+                    title: Text(device.platformName),
+                    subtitle: Text(device.platformName.toString()),
+                    trailing: !inProgress
+                        ? IconButton(
+                            icon: const Icon(Icons.bluetooth_connected),
                             onPressed: () async {
                               setState(() {
                                 inProgress = true;
@@ -57,7 +91,7 @@ class _DeviceListState extends ConsumerState<DeviceList> {
                               await ref
                                   .read(ironProvider.notifier)
                                   .connect(snapshot.data![0].device);
-                              if (mounted) {
+                              if (context.mounted) {
                                 Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(
                                     builder: (context) => const SolderPage(),
@@ -65,52 +99,16 @@ class _DeviceListState extends ConsumerState<DeviceList> {
                                 );
                               }
                             },
-                            child: const Text("Connect To Device"),
                           )
                         : const CircularProgressIndicator(),
-                  ],
-                ),
-              ],
-            );
-          } else {
-            return Column(
-              children: [
-                Text("Found $numDev IronOS devices!"),
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: numDev,
-                  itemBuilder: (context, index) {
-                    final device = snapshot.data![index].device;
-                    return ListTile(
-                      title: Text(device.localName),
-                      subtitle: Text(device.localName.toString()),
-                      trailing: !inProgress
-                          ? IconButton(
-                              icon: const Icon(Icons.bluetooth_connected),
-                              onPressed: () async {
-                                setState(() {
-                                  inProgress = true;
-                                });
-                                await ref
-                                    .read(ironProvider.notifier)
-                                    .connect(snapshot.data![0].device);
-                                if (mounted) {
-                                  Navigator.of(context).pushReplacement(
-                                    MaterialPageRoute(
-                                      builder: (context) => const SolderPage(),
-                                    ),
-                                  );
-                                }
-                              },
-                            )
-                          : const CircularProgressIndicator(),
-                    );
-                  },
-                ),
-                // Connect Button
-              ],
-            );
-          }
-        });
+                  );
+                },
+              ),
+              // Connect Button
+            ],
+          );
+        }
+      },
+    );
   }
 }

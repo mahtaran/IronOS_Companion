@@ -1,11 +1,4 @@
-enum OperatingMode {
-  idle,
-  soldering,
-  boost,
-  sleeping,
-  settings,
-  debug,
-}
+enum OperatingMode { idle, soldering, boost, sleeping, settings, debug }
 
 // Map 0 to 5 to OperatingMode enum values
 OperatingMode operatingModeFromInt(int value) {

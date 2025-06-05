@@ -24,7 +24,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     tempValue = ref.read(ironProvider).data?.setpoint ?? -1;
     boostValue =
         ref.read(ironSettingsProvider).settings?.solderingSettings.boostTemp ??
-            -1;
+        -1;
 
     super.initState();
   }
@@ -43,101 +43,101 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
 
     return Scaffold(
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            ironSN.saveToFlash();
-          },
-          icon: const Icon(Icons.save),
-          label: const Text(
-            "Save to Flash",
-            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
-          ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          ironSN.saveToFlash();
+        },
+        icon: const Icon(Icons.save),
+        label: const Text(
+          "Save to Flash",
+          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
         ),
-        body: CustomScrollView(
-          slivers: [
-            SliverAppBar.large(
-              //title: const Text("Settings"),
-              flexibleSpace: FlexibleSpaceBar(
-                title: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Text(
-                      "Settings",
-                    ),
-                    Text(
-                      "for ${ironP.name}",
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ],
-                ),
-                background: Align(
-                  alignment: Alignment.bottomRight,
-                  child: Icon(
-                    Icons.bluetooth_connected,
-                    size: 150,
-                    color:
-                        Theme.of(context).colorScheme.primary.withOpacity(0.2),
+      ),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar.large(
+            //title: const Text("Settings"),
+            flexibleSpace: FlexibleSpaceBar(
+              title: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text("Settings"),
+                  Text(
+                    "for ${ironP.name}",
+                    style: Theme.of(context).textTheme.bodyMedium,
                   ),
-                ),
-                collapseMode: CollapseMode.parallax,
+                ],
               ),
+              background: Align(
+                alignment: Alignment.bottomRight,
+                child: Icon(
+                  Icons.bluetooth_connected,
+                  size: 150,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.2),
+                ),
+              ),
+              collapseMode: CollapseMode.parallax,
             ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 20),
-                    ironP.isConnected == false
-                        ? Column(
-                            children: [
-                              const Text("Not connected to an iron"),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text(
-                                  "Go back",
-                                  style: TextStyle(fontSize: 15),
-                                ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  ironP.isConnected == false
+                      ? Column(
+                          children: [
+                            const Text("Not connected to an iron"),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text(
+                                "Go back",
+                                style: TextStyle(fontSize: 15),
                               ),
-                            ],
-                          )
-                        : ironS.settings == null
-                            ? ironS.isRetrieveing
-                                ? const Column(
-                                    children: [
-                                      CircularProgressIndicator(),
-                                      SizedBox(height: 10),
-                                      Text("Retrieving settings..."),
-                                    ],
-                                  )
-                                : Column(
-                                    children: [
-                                      const Text("Failed to retrieve settings"),
-                                      TextButton(
-                                        onPressed: () {
-                                          ironSN.getSettings();
-                                        },
-                                        child: const Text("Retry"),
-                                      ),
-                                    ],
-                                  )
-                            : const Column(
+                            ),
+                          ],
+                        )
+                      : ironS.settings == null
+                      ? ironS.isRetrieveing
+                            ? const Column(
                                 children: [
-                                  SolderingSettingsTile(),
-                                  SleepSettingsTile(),
-                                  PowerSettingsTile(),
-                                  UISettingsTile(),
-                                  SizedBox(height: 50),
+                                  CircularProgressIndicator(),
+                                  SizedBox(height: 10),
+                                  Text("Retrieving settings..."),
                                 ],
                               )
-                  ],
-                ),
+                            : Column(
+                                children: [
+                                  const Text("Failed to retrieve settings"),
+                                  TextButton(
+                                    onPressed: () {
+                                      ironSN.getSettings();
+                                    },
+                                    child: const Text("Retry"),
+                                  ),
+                                ],
+                              )
+                      : const Column(
+                          children: [
+                            SolderingSettingsTile(),
+                            SleepSettingsTile(),
+                            PowerSettingsTile(),
+                            UISettingsTile(),
+                            SizedBox(height: 50),
+                          ],
+                        ),
+                ],
               ),
             ),
-          ],
-        ));
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -20,7 +20,8 @@ class _SleepSettingsTileState extends ConsumerState<SleepSettingsTile> {
 
   @override
   void initState() {
-    sensitivityValue = ref
+    sensitivityValue =
+        ref
             .read(ironSettingsProvider)
             .settings
             ?.sleepSettings
@@ -30,8 +31,9 @@ class _SleepSettingsTileState extends ConsumerState<SleepSettingsTile> {
         ref.read(ironSettingsProvider).settings?.sleepSettings.sleepTemp ?? -1;
     sleepTimeValue =
         ref.read(ironSettingsProvider).settings?.sleepSettings.sleepTimeout ??
-            -1;
-    shutdownTimeValue = ref
+        -1;
+    shutdownTimeValue =
+        ref
             .read(ironSettingsProvider)
             .settings
             ?.sleepSettings
@@ -56,19 +58,18 @@ class _SleepSettingsTileState extends ConsumerState<SleepSettingsTile> {
       sleepTimeValue = ironS.settings?.sleepSettings.sleepTimeout ?? -1;
     }
     if (shutdownTimeValue.inSeconds == -1) {
-      shutdownTimeValue = ironS.settings?.sleepSettings.shutdownTimeout ??
+      shutdownTimeValue =
+          ironS.settings?.sleepSettings.shutdownTimeout ??
           const Duration(seconds: -1);
     }
 
     return ExpansionTile(
       title: const Text("Sleep Settings"),
-      subtitle:
-          const Text("Sleep mode settings like sensitivity, timeout, etc..."),
-      expandedCrossAxisAlignment: CrossAxisAlignment.start,
-      childrenPadding: const EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 10,
+      subtitle: const Text(
+        "Sleep mode settings like sensitivity, timeout, etc...",
       ),
+      expandedCrossAxisAlignment: CrossAxisAlignment.start,
+      childrenPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       children: [
         const Text("Motion Sensitivity"),
         const SizedBox(height: 10),
@@ -76,14 +77,8 @@ class _SleepSettingsTileState extends ConsumerState<SleepSettingsTile> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text("Off", style: Theme.of(context).textTheme.bodySmall),
-            Text(
-              "Medium",
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-            Text(
-              "High",
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
+            Text("Medium", style: Theme.of(context).textTheme.bodySmall),
+            Text("High", style: Theme.of(context).textTheme.bodySmall),
           ],
         ),
         Slider(

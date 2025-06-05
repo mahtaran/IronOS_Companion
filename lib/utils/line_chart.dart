@@ -5,25 +5,26 @@ import 'package:flutter/material.dart';
 
 import '../data/iron_data.dart';
 
-LineChartData genLineChartData(List<FlSpot> spots, List<FlSpot> powerSpots,
-    List<FlSpot> setpointSpots, IronData? data, int maxTemp) {
+LineChartData genLineChartData(
+  List<FlSpot> spots,
+  List<FlSpot> powerSpots,
+  List<FlSpot> setpointSpots,
+  IronData? data,
+  int maxTemp,
+) {
   return LineChartData(
     minY: 0,
 
     // Only show the last 60 data points using setpointSpots.length
     minX: max(0, spots.length - 60).toDouble(),
-    maxY:
-        max((data?.setpoint.toDouble() ?? 400) * 1.1, maxTemp.toDouble() * 1.1),
+    maxY: max(
+      (data?.setpoint.toDouble() ?? 400) * 1.1,
+      maxTemp.toDouble() * 1.1,
+    ),
     lineTouchData: const LineTouchData(enabled: true),
-    gridData: const FlGridData(
-      show: false,
-    ),
-    titlesData: const FlTitlesData(
-      show: false,
-    ),
-    borderData: FlBorderData(
-      show: false,
-    ),
+    gridData: const FlGridData(show: false),
+    titlesData: const FlTitlesData(show: false),
+    borderData: FlBorderData(show: false),
     lineBarsData: [
       LineChartBarData(
         spots: spots,
@@ -35,18 +36,15 @@ LineChartData genLineChartData(List<FlSpot> spots, List<FlSpot> powerSpots,
           show: true,
           gradient: LinearGradient(
             colors: [
-              Colors.red.withOpacity(0.1),
-              Colors.blue.withOpacity(0.1),
+              Colors.red.withValues(alpha: 0.1),
+              Colors.blue.withValues(alpha: 0.1),
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
         ),
         gradient: const LinearGradient(
-          colors: [
-            Colors.red,
-            Colors.blue,
-          ],
+          colors: [Colors.red, Colors.blue],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
@@ -59,10 +57,7 @@ LineChartData genLineChartData(List<FlSpot> spots, List<FlSpot> powerSpots,
         show: true,
         dotData: const FlDotData(show: false),
         gradient: const LinearGradient(
-          colors: [
-            Colors.green,
-            Colors.greenAccent,
-          ],
+          colors: [Colors.green, Colors.greenAccent],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
@@ -77,8 +72,8 @@ LineChartData genLineChartData(List<FlSpot> spots, List<FlSpot> powerSpots,
           show: true,
           gradient: LinearGradient(
             colors: [
-              Colors.orange.withOpacity(0.1),
-              Colors.orangeAccent.withOpacity(0.1),
+              Colors.orange.withValues(alpha: 0.1),
+              Colors.orangeAccent.withValues(alpha: 0.1),
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -86,10 +81,7 @@ LineChartData genLineChartData(List<FlSpot> spots, List<FlSpot> powerSpots,
         ),
         dotData: const FlDotData(show: false),
         gradient: const LinearGradient(
-          colors: [
-            Colors.orange,
-            Colors.orangeAccent,
-          ],
+          colors: [Colors.orange, Colors.orangeAccent],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),

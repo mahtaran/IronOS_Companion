@@ -25,7 +25,7 @@ class _SolderingSettingsTileState extends ConsumerState<SolderingSettingsTile> {
     tempValue = ref.read(ironProvider).data?.setpoint ?? -1;
     boostValue =
         ref.read(ironSettingsProvider).settings?.solderingSettings.boostTemp ??
-            -1;
+        -1;
 
     super.initState();
   }
@@ -45,10 +45,7 @@ class _SolderingSettingsTileState extends ConsumerState<SolderingSettingsTile> {
       title: const Text("Soldering Settings"),
       subtitle: const Text("Temperature, Start Up Behavior, etc..."),
       expandedCrossAxisAlignment: CrossAxisAlignment.start,
-      childrenPadding: const EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 10,
-      ),
+      childrenPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       children: [
         const Text("Soldering Temperature"),
         Slider(
@@ -112,9 +109,7 @@ class _SolderingSettingsTileState extends ConsumerState<SolderingSettingsTile> {
         ////////////////////////////
         Row(
           children: [
-            const Expanded(
-              child: Text("Temp Change Short"),
-            ),
+            const Expanded(child: Text("Temp Change Short")),
             SizedBox(
               width: 100,
               child: TextField(
@@ -126,9 +121,7 @@ class _SolderingSettingsTileState extends ConsumerState<SolderingSettingsTile> {
                   }
                   ironSN.setTempChangeShort(int.parse(value));
                 },
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(border: OutlineInputBorder()),
               ),
             ),
             const SizedBox(width: 10),
@@ -139,9 +132,7 @@ class _SolderingSettingsTileState extends ConsumerState<SolderingSettingsTile> {
         ////////////////////////////
         Row(
           children: [
-            const Expanded(
-              child: Text("Temp Change Long"),
-            ),
+            const Expanded(child: Text("Temp Change Long")),
             SizedBox(
               width: 100,
               child: TextField(
@@ -153,9 +144,7 @@ class _SolderingSettingsTileState extends ConsumerState<SolderingSettingsTile> {
                   }
                   ironSN.setTempChangeShort(int.parse(value));
                 },
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(border: OutlineInputBorder()),
               ),
             ),
             const SizedBox(width: 10),

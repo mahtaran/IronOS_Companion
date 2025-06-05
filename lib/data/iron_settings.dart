@@ -168,13 +168,7 @@ class PowerSettings {
   }
 }
 
-enum PowerSource {
-  dc,
-  threeCell,
-  fourCell,
-  fiveCell,
-  sixCell,
-}
+enum PowerSource { dc, threeCell, fourCell, fiveCell, sixCell }
 
 class SleepMode {
   int motionSensitivity;
@@ -348,11 +342,7 @@ enum StartupBehavior {
   standbyWithoutHeating,
 }
 
-enum LockingBehavior {
-  off,
-  boostOnly,
-  full,
-}
+enum LockingBehavior { off, boostOnly, full }
 
 class UISettings {
   TempUnit tempUnit;
@@ -486,28 +476,13 @@ class UISettings {
   }
 }
 
-enum TempUnit {
-  celsius,
-  fahrenheit,
-}
+enum TempUnit { celsius, fahrenheit }
 
-enum DisplayOrientation {
-  right,
-  left,
-  auto,
-}
+enum DisplayOrientation { right, left, auto }
 
-enum ScrollingSpeed {
-  slow,
-  fast,
-}
+enum ScrollingSpeed { slow, fast }
 
-enum AnimationSpeed {
-  off,
-  slow,
-  medium,
-  fast,
-}
+enum AnimationSpeed { off, slow, medium, fast }
 
 class AdvancedSettings {
   int powerLimit;

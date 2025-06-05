@@ -35,9 +35,7 @@ class _SolderPageState extends ConsumerState<SolderPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text("Connecting to device..."),
-                  SizedBox(
-                    height: 10,
-                  ),
+                  SizedBox(height: 10),
                   CircularProgressIndicator(),
                 ],
               ),
@@ -48,9 +46,7 @@ class _SolderPageState extends ConsumerState<SolderPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(
-                    height: 10,
-                  ),
+                  const SizedBox(height: 10),
                   const Thermostat(),
                   Padding(
                     padding: const EdgeInsets.symmetric(
@@ -65,13 +61,8 @@ class _SolderPageState extends ConsumerState<SolderPage> {
                           Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Icon(
-                                Icons.thermostat_outlined,
-                                size: 30,
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
+                              const Icon(Icons.thermostat_outlined, size: 30),
+                              const SizedBox(height: 10),
                               Text(
                                 "${ironP.data?.currentTemp ?? 0}°C",
                                 style: Theme.of(context).textTheme.bodyLarge,
@@ -81,13 +72,8 @@ class _SolderPageState extends ConsumerState<SolderPage> {
                           Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Icon(
-                                Icons.bolt_outlined,
-                                size: 30,
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
+                              const Icon(Icons.bolt_outlined, size: 30),
+                              const SizedBox(height: 10),
                               Text(
                                 "${ironP.data?.inputVoltage ?? 0}V",
                                 style: Theme.of(context).textTheme.bodyLarge,
@@ -97,13 +83,8 @@ class _SolderPageState extends ConsumerState<SolderPage> {
                           Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Icon(
-                                Icons.power_rounded,
-                                size: 30,
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
+                              const Icon(Icons.power_rounded, size: 30),
+                              const SizedBox(height: 10),
                               Text(
                                 "${ironP.data?.estimatedWattage ?? 0}W",
                                 style: Theme.of(context).textTheme.bodyLarge,
@@ -113,13 +94,8 @@ class _SolderPageState extends ConsumerState<SolderPage> {
                           Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Icon(
-                                Icons.front_hand_rounded,
-                                size: 30,
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
+                              const Icon(Icons.front_hand_rounded, size: 30),
+                              const SizedBox(height: 10),
                               Text(
                                 "${ironP.data?.handleTemp ?? 0}ºC",
                                 style: Theme.of(context).textTheme.bodyLarge,

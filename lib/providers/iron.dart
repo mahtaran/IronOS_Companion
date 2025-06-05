@@ -32,10 +32,7 @@ class IronState {
 
   // toMap and toJson but only static
   Map<String, dynamic> toMapStatic() {
-    return {
-      'name': name,
-      'id': id,
-    };
+    return {'name': name, 'id': id};
   }
 
   String toJsonStatic() => json.encode(toMapStatic());
@@ -116,7 +113,12 @@ class IronProvider extends StateNotifier<IronState> {
       state = IronState.fromMap(box.toMap());
     }
 
-    FlutterBluePlus.connectedSystemDevices.then((value) async {
+    final services = [
+      // GAP Service
+      // TODO: Can probably be more specific
+      Guid("1800"),
+    ];
+    FlutterBluePlus.systemDevices(services).then((value) async {
       if (value.isNotEmpty) {
         for (final device in value) {
           if (device.remoteId.str == state.id) {
@@ -143,20 +145,17 @@ class IronProvider extends StateNotifier<IronState> {
 
     int count = 0;
     // Await Bluetooth ready
-    Timer.periodic(
-      const Duration(milliseconds: 50),
-      (timer) async {
-        count++;
-        if (count > 10) {
-          timer.cancel();
-        }
-        if (await FlutterBluePlus.adapterState.first ==
-            BluetoothAdapterState.on) {
-          timer.cancel();
-          startScan();
-        }
-      },
-    );
+    Timer.periodic(const Duration(milliseconds: 50), (timer) async {
+      count++;
+      if (count > 10) {
+        timer.cancel();
+      }
+      if (await FlutterBluePlus.adapterState.first ==
+          BluetoothAdapterState.on) {
+        timer.cancel();
+        startScan();
+      }
+    });
   }
 
   @override
@@ -172,8 +171,9 @@ class IronProvider extends StateNotifier<IronState> {
 
   void resumeTimer() {
     _timer?.cancel();
-    final stateService = services!
-        .firstWhere((element) => element.uuid.toString() == IronServices.bulk);
+    final stateService = services!.firstWhere(
+      (element) => element.uuid.toString() == IronServices.bulk,
+    );
     _timer = Timer.periodic(
       const Duration(milliseconds: 1000),
       (_) => poll(stateService),
@@ -207,12 +207,14 @@ class IronProvider extends StateNotifier<IronState> {
     int currTMax = state.data?.setpoint ?? 0;
     for (int i = 0; i < _history.length; i++) {
       spots.add(FlSpot(i.toDouble(), _history[i].currentTemp.toDouble()));
-      powerSpots
-          .add(FlSpot(i.toDouble(), _history[i].estimatedWattage.toDouble()));
+      powerSpots.add(
+        FlSpot(i.toDouble(), _history[i].estimatedWattage.toDouble()),
+      );
       // Only add setpoint if the power is on
       if (_history[i].currentMode == OperatingMode.soldering) {
-        setpointSpots
-            .add(FlSpot(i.toDouble(), _history[i].setpoint.toDouble()));
+        setpointSpots.add(
+          FlSpot(i.toDouble(), _history[i].setpoint.toDouble()),
+        );
       }
 
       // Update the max value
@@ -258,13 +260,15 @@ class IronProvider extends StateNotifier<IronState> {
     _isScanning = true;
 
     try {
-      await FlutterBluePlus.startScan(withServices: [
-        Guid(IronServices.bulk), // Bulk data
-        Guid(IronServices.settings) // Settings
-      ]);
+      await FlutterBluePlus.startScan(
+        withServices: [
+          Guid(IronServices.bulk), // Bulk data
+          Guid(IronServices.settings), // Settings
+        ],
+      );
     } // Catch FlutterBluePlusError
     on FlutterBluePlusException catch (error, _) {
-      if (error.errorCode == 1) {
+      if (error.code == 1) {
         // Scan already in progress error, should stop and restart scan
         await FlutterBluePlus.stopScan();
         startScan();
@@ -290,7 +294,7 @@ class IronProvider extends StateNotifier<IronState> {
 
     state = state.copyWith(
       isConnected: true,
-      name: device.localName,
+      name: device.platformName,
       id: device.remoteId.str,
       device: device,
     );
@@ -302,8 +306,9 @@ class IronProvider extends StateNotifier<IronState> {
     // Discover services
     services = await device.discoverServices();
 
-    final stateService = services!
-        .firstWhere((element) => element.uuid.toString() == IronServices.bulk);
+    final stateService = services!.firstWhere(
+      (element) => element.uuid.toString() == IronServices.bulk,
+    );
 
     // Setup timer for polling characteristics
     _timer?.cancel();
@@ -322,9 +327,7 @@ class IronProvider extends StateNotifier<IronState> {
 
   void disconnectListener(BluetoothConnectionState event) {
     if (event == BluetoothConnectionState.disconnected) {
-      state = state.copyWith(
-        isConnected: false,
-      );
+      state = state.copyWith(isConnected: false);
       _timer?.cancel();
 
       // Attempt to reconnect
@@ -339,9 +342,7 @@ class IronProvider extends StateNotifier<IronState> {
   Future<void> disconnect() async {
     _timer?.cancel();
     await state.device!.disconnect();
-    state = state.copyWith(
-      isConnected: false,
-    );
+    state = state.copyWith(isConnected: false);
   }
 
   Future<void> poll(BluetoothService stateService) async {
@@ -364,9 +365,7 @@ class IronProvider extends StateNotifier<IronState> {
     final IronData ironData = extractData(chars);
 
     // Update state
-    state = state.copyWith(
-      data: ironData,
-    );
+    state = state.copyWith(data: ironData);
 
     // Add to history, ensure we don't have more than 60 entries
     _history.add(ironData);
@@ -379,11 +378,7 @@ class IronProvider extends StateNotifier<IronState> {
   }
 
   void setTemp(int temp) {
-    state = state.copyWith(
-      data: state.data?.copyWith(
-        setpoint: temp,
-      ),
-    );
+    state = state.copyWith(data: state.data?.copyWith(setpoint: temp));
   }
 
   Future<void> getPerms() async {
@@ -511,5 +506,6 @@ class IronProvider extends StateNotifier<IronState> {
   }
 }
 
-final ironProvider =
-    StateNotifierProvider<IronProvider, IronState>((ref) => IronProvider());
+final ironProvider = StateNotifierProvider<IronProvider, IronState>(
+  (ref) => IronProvider(),
+);

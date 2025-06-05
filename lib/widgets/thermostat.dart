@@ -32,11 +32,12 @@ class _ThermostatState extends ConsumerState<Thermostat> {
           customColors: CustomSliderColors(
             trackColor: Colors.grey[300],
             progressBarColors: getGradientFromMode(
-                ironP.data?.currentMode ?? OperatingMode.idle),
+              ironP.data?.currentMode ?? OperatingMode.idle,
+            ),
             shadowColor: Colors.grey[300],
             shadowMaxOpacity: 0.1,
             shadowStep: 10,
-            dotColor: Colors.grey[300]?.withOpacity(0.3),
+            dotColor: Colors.grey[300]?.withValues(alpha: 0.3),
             hideShadow: false,
           ),
           infoProperties: InfoProperties(
@@ -54,8 +55,10 @@ class _ThermostatState extends ConsumerState<Thermostat> {
           size: 330,
           animationEnabled: false,
         ),
-        max: max(ironP.data?.maxTemp.toDouble() ?? 400,
-            ironP.data?.setpoint.toDouble() ?? 0),
+        max: max(
+          ironP.data?.maxTemp.toDouble() ?? 400,
+          ironP.data?.setpoint.toDouble() ?? 0,
+        ),
         min: 0,
         initialValue: ironP.data?.setpoint.toDouble() ?? 0,
         onChangeEnd: (value) {
@@ -72,11 +75,7 @@ class _ThermostatState extends ConsumerState<Thermostat> {
               appearance: CircularSliderAppearance(
                 customColors: CustomSliderColors(
                   trackColor: Colors.transparent,
-                  progressBarColors: [
-                    Colors.red,
-                    Colors.orange,
-                    Colors.yellow,
-                  ],
+                  progressBarColors: [Colors.red, Colors.orange, Colors.yellow],
                   shadowColor: Colors.transparent,
                   shadowMaxOpacity: 0,
                   shadowStep: 10,
@@ -107,8 +106,10 @@ class _ThermostatState extends ConsumerState<Thermostat> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           AnimatedScale(
-                            scale: (isHeating(ironP.data?.currentMode ??
-                                    OperatingMode.idle))
+                            scale:
+                                (isHeating(
+                                  ironP.data?.currentMode ?? OperatingMode.idle,
+                                ))
                                 ? 1
                                 : 0.8,
                             curve: Curves.easeInOut,
@@ -118,12 +119,14 @@ class _ThermostatState extends ConsumerState<Thermostat> {
                               style: TextStyle(
                                 fontSize: 30,
                                 fontWeight: FontWeight.bold,
-                                color: !(isHeating(ironP.data?.currentMode ??
-                                        OperatingMode.idle))
-                                    ? Theme.of(context)
-                                        .textTheme
-                                        .displaySmall!
-                                        .color
+                                color:
+                                    !(isHeating(
+                                      ironP.data?.currentMode ??
+                                          OperatingMode.idle,
+                                    ))
+                                    ? Theme.of(
+                                        context,
+                                      ).textTheme.displaySmall!.color
                                     : Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
@@ -165,8 +168,11 @@ class _ThermostatState extends ConsumerState<Thermostat> {
                                 padding: const EdgeInsets.all(15),
                               ),
                               onPressed: () {
-                                int newTemp = ironP.data!.setpoint -
-                                    (ironS.settings?.solderingSettings
+                                int newTemp =
+                                    ironP.data!.setpoint -
+                                    (ironS
+                                            .settings
+                                            ?.solderingSettings
                                             .tempChangeShortPress ??
                                         1);
                                 if (newTemp <= 0) {
@@ -178,8 +184,11 @@ class _ThermostatState extends ConsumerState<Thermostat> {
                                 HapticFeedback.mediumImpact();
                               },
                               onLongPress: () {
-                                int newTemp = ironP.data!.setpoint -
-                                    (ironS.settings?.solderingSettings
+                                int newTemp =
+                                    ironP.data!.setpoint -
+                                    (ironS
+                                            .settings
+                                            ?.solderingSettings
                                             .tempChangeLongPress ??
                                         10);
                                 if (newTemp <= 0) {
@@ -200,24 +209,29 @@ class _ThermostatState extends ConsumerState<Thermostat> {
                                 Text(
                                   'Status:',
                                   style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
                                   ),
                                 ),
                                 const Padding(padding: EdgeInsets.all(5)),
                                 Container(
                                   decoration: BoxDecoration(
                                     gradient: getColorFromMode(
-                                        ironP.data?.currentMode ??
-                                            OperatingMode.idle),
+                                      ironP.data?.currentMode ??
+                                          OperatingMode.idle,
+                                    ),
                                     shape: BoxShape.circle,
                                   ),
                                   padding: const EdgeInsets.all(15),
                                   child: Icon(
-                                    getIconFromMode(ironP.data?.currentMode ??
-                                        OperatingMode.idle),
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
+                                    getIconFromMode(
+                                      ironP.data?.currentMode ??
+                                          OperatingMode.idle,
+                                    ),
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
                                   ),
                                 ),
                               ],
@@ -229,8 +243,11 @@ class _ThermostatState extends ConsumerState<Thermostat> {
                                 padding: const EdgeInsets.all(15),
                               ),
                               onPressed: () {
-                                int newTemp = ironP.data!.setpoint +
-                                    (ironS.settings?.solderingSettings
+                                int newTemp =
+                                    ironP.data!.setpoint +
+                                    (ironS
+                                            .settings
+                                            ?.solderingSettings
                                             .tempChangeShortPress ??
                                         1);
                                 if (newTemp >= ironP.data!.maxTemp) {
@@ -242,8 +259,11 @@ class _ThermostatState extends ConsumerState<Thermostat> {
                                 HapticFeedback.mediumImpact();
                               },
                               onLongPress: () {
-                                int newTemp = ironP.data!.setpoint +
-                                    (ironS.settings?.solderingSettings
+                                int newTemp =
+                                    ironP.data!.setpoint +
+                                    (ironS
+                                            .settings
+                                            ?.solderingSettings
                                             .tempChangeLongPress ??
                                         10);
                                 if (newTemp >= ironP.data!.maxTemp) {
@@ -276,81 +296,35 @@ class _ThermostatState extends ConsumerState<Thermostat> {
   LinearGradient getColorFromMode(OperatingMode mode) {
     switch (mode) {
       case OperatingMode.idle:
-        return const LinearGradient(colors: [
-          Colors.grey,
-          Colors.blueGrey,
-        ]);
+        return const LinearGradient(colors: [Colors.grey, Colors.blueGrey]);
       case OperatingMode.soldering:
-        return const LinearGradient(colors: [
-          Colors.red,
-          Colors.orange,
-        ]);
+        return const LinearGradient(colors: [Colors.red, Colors.orange]);
       case OperatingMode.boost:
-        return LinearGradient(colors: [
-          Colors.red,
-          Colors.red.shade900,
-        ]);
+        return LinearGradient(colors: [Colors.red, Colors.red.shade900]);
       case OperatingMode.settings:
-        return const LinearGradient(colors: [
-          Colors.blue,
-          Colors.cyan,
-        ]);
+        return const LinearGradient(colors: [Colors.blue, Colors.cyan]);
       case OperatingMode.debug:
-        return LinearGradient(colors: [
-          Colors.green,
-          Colors.green.shade900,
-        ]);
+        return LinearGradient(colors: [Colors.green, Colors.green.shade900]);
       case OperatingMode.sleeping:
-        return const LinearGradient(colors: [
-          Colors.purple,
-          Colors.blue,
-        ]);
-      default:
-        return const LinearGradient(colors: [
-          Colors.grey,
-          Colors.blueGrey,
-        ]);
+        return const LinearGradient(colors: [Colors.purple, Colors.blue]);
     }
   }
 
   List<Color> getGradientFromMode(OperatingMode mode) {
     switch (mode) {
       case OperatingMode.idle:
-        return [
-          Colors.grey,
-          Colors.blueGrey,
-        ];
+        return [Colors.grey, Colors.blueGrey];
 
       case OperatingMode.soldering:
-        return [
-          Colors.red,
-          Colors.orange,
-        ];
+        return [Colors.red, Colors.orange];
       case OperatingMode.boost:
-        return [
-          Colors.red,
-          Colors.redAccent,
-        ];
+        return [Colors.red, Colors.redAccent];
       case OperatingMode.settings:
-        return [
-          Colors.grey,
-          Colors.blueGrey,
-        ];
+        return [Colors.grey, Colors.blueGrey];
       case OperatingMode.debug:
-        return [
-          Colors.grey,
-          Colors.blueGrey,
-        ];
+        return [Colors.grey, Colors.blueGrey];
       case OperatingMode.sleeping:
-        return [
-          Colors.purple,
-          Colors.blue,
-        ];
-      default:
-        return [
-          Colors.grey,
-          Colors.blueGrey,
-        ];
+        return [Colors.purple, Colors.blue];
     }
   }
 
@@ -368,8 +342,6 @@ class _ThermostatState extends ConsumerState<Thermostat> {
         return Icons.bug_report_rounded;
       case OperatingMode.sleeping:
         return Icons.bedtime_rounded;
-      default:
-        return Icons.power_settings_new_outlined;
     }
   }
 

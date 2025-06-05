@@ -30,10 +30,7 @@ class _DeviceAppBarState extends ConsumerState<DeviceAppBar> {
             value: ironP.name,
             child: SizedBox(
               child: Chip(
-                side: const BorderSide(
-                  color: Colors.transparent,
-                  width: 0,
-                ),
+                side: const BorderSide(color: Colors.transparent, width: 0),
                 label: Text(ironP.name),
                 avatar: ironP.isConnected
                     ? const Icon(
@@ -52,10 +49,7 @@ class _DeviceAppBarState extends ConsumerState<DeviceAppBar> {
             value: "add",
             child: SizedBox(
               child: Chip(
-                side: BorderSide(
-                  color: Colors.transparent,
-                  width: 0,
-                ),
+                side: BorderSide(color: Colors.transparent, width: 0),
                 label: Text("Add Device"),
                 avatar: Icon(
                   Icons.bluetooth_searching_rounded,
@@ -74,13 +68,11 @@ class _DeviceAppBarState extends ConsumerState<DeviceAppBar> {
               label: Row(
                 children: [
                   Text(ironP.name),
-                  const SizedBox(
-                    width: 5,
-                  ),
+                  const SizedBox(width: 5),
                   Icon(
                     Icons.arrow_drop_down_rounded,
                     color: Theme.of(context).iconTheme.color,
-                  )
+                  ),
                 ],
               ),
               avatar: ironP.isConnected
@@ -123,9 +115,7 @@ class _DeviceAppBarState extends ConsumerState<DeviceAppBar> {
           icon: const Icon(Icons.settings_rounded),
           onPressed: () {
             Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const SettingsScreen(),
-              ),
+              MaterialPageRoute(builder: (context) => const SettingsScreen()),
             );
           },
         ),

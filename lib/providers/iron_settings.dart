@@ -12,15 +12,9 @@ class IronSettingsState {
   IronSettings? settings;
   bool isRetrieveing;
 
-  IronSettingsState({
-    this.settings,
-    this.isRetrieveing = false,
-  });
+  IronSettingsState({this.settings, this.isRetrieveing = false});
 
-  IronSettingsState copyWith({
-    IronSettings? settings,
-    bool? isRetrieveing,
-  }) {
+  IronSettingsState copyWith({IronSettings? settings, bool? isRetrieveing}) {
     return IronSettingsState(
       settings: settings ?? this.settings,
       isRetrieveing: isRetrieveing ?? this.isRetrieveing,
@@ -29,10 +23,7 @@ class IronSettingsState {
 
   // error state factory
   factory IronSettingsState.error() {
-    return IronSettingsState(
-      settings: null,
-      isRetrieveing: false,
-    );
+    return IronSettingsState(settings: null, isRetrieveing: false);
   }
 
   @override
@@ -54,9 +45,7 @@ class IronSettingsState {
 
 class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   IronSettingsProvider(this.ref) : super(IronSettingsState()) {
-    state = IronSettingsState(
-      isRetrieveing: false,
-    );
+    state = IronSettingsState(isRetrieveing: false);
 
     ref.listen(ironProvider, connectionListener);
   }
@@ -74,9 +63,7 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   }
 
   Future<void> getSettings() async {
-    state = state.copyWith(
-      isRetrieveing: true,
-    );
+    state = state.copyWith(isRetrieveing: true);
 
     final ironN = ref.read(ironProvider.notifier);
     final iron = ref.read(ironProvider);
@@ -92,15 +79,15 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
     }
 
     try {
-      state = state.copyWith(
-        isRetrieveing: true,
-      );
+      state = state.copyWith(isRetrieveing: true);
 
       // Get the services
       final settingsService = ironN.services!.firstWhere(
-          (element) => element.uuid.toString() == IronServices.settings);
+        (element) => element.uuid.toString() == IronServices.settings,
+      );
       final bulkService = ironN.services!.firstWhere(
-          (element) => element.uuid.toString() == IronServices.bulk);
+        (element) => element.uuid.toString() == IronServices.bulk,
+      );
 
       // Get Power Settings
       PowerSettings powerSettings = await _getPowerSettings(settingsService);
@@ -109,8 +96,9 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
       await ironN.poll(bulkService);
 
       // Get Sleep Settings
-      SolderingSettings solderingSettings =
-          await _getSolderingSettings(settingsService);
+      SolderingSettings solderingSettings = await _getSolderingSettings(
+        settingsService,
+      );
 
       // Refresh the iron provider
       await ironN.poll(bulkService);
@@ -122,8 +110,9 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
       await ironN.poll(bulkService);
 
       // Get advanced settings
-      AdvancedSettings? advancedSettings =
-          await _getAdvancedSettings(settingsService);
+      AdvancedSettings? advancedSettings = await _getAdvancedSettings(
+        settingsService,
+      );
 
       // Refresh the iron provider
       await ironN.poll(bulkService);
@@ -150,15 +139,15 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
     }
 
     ironN.resumeTimer();
-    state = state.copyWith(
-      isRetrieveing: false,
-    );
+    state = state.copyWith(isRetrieveing: false);
   }
 
   Future<PowerSettings> _getPowerSettings(BluetoothService service) async {
     // Get the characteristics
-    final sourceChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.dCInCutoff);
+    final sourceChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.dCInCutoff,
+    );
 
     // It is a byte array, so we need to convert it to an int
     final rawCutoff = await sourceChar.read();
@@ -166,20 +155,26 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
 
     final cutoff = PowerSource.values[intCutoff];
 
-    final minVolChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.minVolCell);
+    final minVolChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.minVolCell,
+    );
 
     final rawMinVol = await minVolChar.read();
     final minVolCell = rawMinVol[0];
 
-    final qCMaxVoltageChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.qCMaxVoltage);
+    final qCMaxVoltageChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.qCMaxVoltage,
+    );
 
     final rawQCMaxVoltage = await qCMaxVoltageChar.read();
     final qCMaxVoltage = rawQCMaxVoltage[0];
 
-    final pdTimeoutChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.pdNegTimeout);
+    final pdTimeoutChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.pdNegTimeout,
+    );
 
     final rawPDTimeout = await pdTimeoutChar.read();
     final pdTimeout = rawPDTimeout[0];
@@ -195,40 +190,54 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   }
 
   Future<SolderingSettings> _getSolderingSettings(
-      BluetoothService service) async {
-    final tempChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.setTemperature);
+    BluetoothService service,
+  ) async {
+    final tempChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.setTemperature,
+    );
 
     final rawTemp = await tempChar.read();
     final temp = rawTemp[0] | (rawTemp[1] << 8);
 
-    final boostChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.boostTemperature);
+    final boostChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.boostTemperature,
+    );
 
     final rawBoost = await boostChar.read();
     final boost = rawBoost[0] | (rawBoost[1] << 8);
 
-    final startChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.autoStart);
+    final startChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.autoStart,
+    );
 
     final rawStart = await startChar.read();
     final StartupBehavior start = StartupBehavior.values[rawStart[0]];
 
-    final tempChangeShrtChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() ==
-        IronCharacteristicUUIDSs.tempChangeShortStep);
+    final tempChangeShrtChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() ==
+          IronCharacteristicUUIDSs.tempChangeShortStep,
+    );
 
     final rawTempChangeShrt = await tempChangeShrtChar.read();
     final tempChangeShrt = rawTempChangeShrt[0] | (rawTempChangeShrt[1] << 8);
 
-    final tempChangeLngChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.tempChangeLongStep);
+    final tempChangeLngChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() ==
+          IronCharacteristicUUIDSs.tempChangeLongStep,
+    );
 
     final rawTempChangeLng = await tempChangeLngChar.read();
     final tempChangeLng = rawTempChangeLng[0] | (rawTempChangeLng[1] << 8);
 
-    final lockChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.lockingMode);
+    final lockChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.lockingMode,
+    );
 
     final rawLock = await lockChar.read();
     final LockingBehavior lock = LockingBehavior.values[rawLock[0]];
@@ -246,69 +255,90 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   }
 
   Future<UISettings> _getUISettings(BluetoothService service) async {
-    final unitChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.temperatureUnit);
+    final unitChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.temperatureUnit,
+    );
 
     final rawUnit = await unitChar.read();
     final unit = TempUnit.values[rawUnit[0]];
 
-    final orientationChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.displayRotation);
+    final orientationChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.displayRotation,
+    );
 
     final rawOrientation = await orientationChar.read();
     final orientation = DisplayOrientation.values[rawOrientation[0]];
 
-    final cooldownChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.cooldownBlink);
+    final cooldownChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.cooldownBlink,
+    );
 
     final rawCooldown = await cooldownChar.read();
     final bool cooldown = rawCooldown[0] == 1;
 
-    final scrollSpeedChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.scrollingSpeed);
+    final scrollSpeedChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.scrollingSpeed,
+    );
 
     final rawScrollSpeed = await scrollSpeedChar.read();
     final ScrollingSpeed scrollSpeed = ScrollingSpeed.values[rawScrollSpeed[0]];
 
-    final swapKeysChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() ==
-        IronCharacteristicUUIDSs.reverseButtonTempChange);
+    final swapKeysChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() ==
+          IronCharacteristicUUIDSs.reverseButtonTempChange,
+    );
 
     final rawSwapKeys = await swapKeysChar.read();
     final bool swapKeys = rawSwapKeys[0] == 1;
 
-    final animSpeedChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.animSpeed);
+    final animSpeedChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.animSpeed,
+    );
 
     final rawAnimSpeed = await animSpeedChar.read();
     final AnimationSpeed animSpeed = AnimationSpeed.values[rawAnimSpeed[0]];
 
-    final brightnessChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.brightness);
+    final brightnessChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.brightness,
+    );
 
     final rawBrightness = await brightnessChar.read();
     final brightness = rawBrightness[0] | (rawBrightness[1] << 8);
 
-    final invertChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.colourInversion);
+    final invertChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.colourInversion,
+    );
 
     final rawInvert = await invertChar.read();
     final bool invert = rawInvert[0] == 1;
 
-    final bootDurChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.logoTime);
+    final bootDurChar = service.characteristics.firstWhere(
+      (element) => element.uuid.toString() == IronCharacteristicUUIDSs.logoTime,
+    );
 
     final rawBootDur = await bootDurChar.read();
     final Duration bootDur = Duration(seconds: rawBootDur[0]);
 
-    final advIdleChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.advancedIdle);
+    final advIdleChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.advancedIdle,
+    );
 
     final rawAdvIdle = await advIdleChar.read();
     final bool advIdle = rawAdvIdle[0] == 1;
 
-    final advSolderingChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.advancedSoldering);
+    final advSolderingChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.advancedSoldering,
+    );
 
     final rawAdvSoldering = await advSolderingChar.read();
     final bool advSoldering = rawAdvSoldering[0] == 1;
@@ -331,38 +361,52 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   }
 
   Future<AdvancedSettings> _getAdvancedSettings(
-      BluetoothService service) async {
-    final powerLimitChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.powerLimit);
+    BluetoothService service,
+  ) async {
+    final powerLimitChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.powerLimit,
+    );
 
     final rawPowerLimit = await powerLimitChar.read();
     final powerLimit = rawPowerLimit[0] | (rawPowerLimit[1] << 8);
 
-    final calibrateCJCChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.calibrateCJC);
+    final calibrateCJCChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.calibrateCJC,
+    );
 
     final rawCalibrateCJC = await calibrateCJCChar.read();
     final bool alibrateCJC = rawCalibrateCJC[0] == 1;
 
-    final powerPulseChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.powerPulsePower);
+    final powerPulseChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.powerPulsePower,
+    );
 
     final rawPowerPulse = await powerPulseChar.read();
     final powerPulse = (rawPowerPulse[0] | (rawPowerPulse[1] << 8)) / 10;
 
-    final powerPulseDurChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.powerPulseDuration);
+    final powerPulseDurChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() ==
+          IronCharacteristicUUIDSs.powerPulseDuration,
+    );
 
     final rawPowerPulseDur = await powerPulseDurChar.read();
-    final Duration powerPulseDur =
-        Duration(seconds: rawPowerPulseDur[0] | (rawPowerPulseDur[1] << 8));
+    final Duration powerPulseDur = Duration(
+      seconds: rawPowerPulseDur[0] | (rawPowerPulseDur[1] << 8),
+    );
 
-    final powePulseDelayChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.powerPulseWait);
+    final powePulseDelayChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.powerPulseWait,
+    );
 
     final rawPowerPulseDelay = await powePulseDelayChar.read();
-    final Duration powerPulseDelay =
-        Duration(seconds: rawPowerPulseDelay[0] | (rawPowerPulseDelay[1] << 8));
+    final Duration powerPulseDelay = Duration(
+      seconds: rawPowerPulseDelay[0] | (rawPowerPulseDelay[1] << 8),
+    );
 
     final advancedSetings = AdvancedSettings(
       powerLimit: powerLimit,
@@ -376,27 +420,36 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   }
 
   Future<SleepSettings> _getSleepSettings(BluetoothService service) async {
-    final sleepTempChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.sleepTemperature);
+    final sleepTempChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.sleepTemperature,
+    );
 
     final rawSleepTemp = await sleepTempChar.read();
     final sleepTemp = rawSleepTemp[0] | (rawSleepTemp[1] << 8);
 
-    final sleepDelayChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.sleepTimeout);
+    final sleepDelayChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.sleepTimeout,
+    );
 
     final rawSleepDelay = await sleepDelayChar.read();
     final int sleepDelay = rawSleepDelay[0] | (rawSleepDelay[1] << 8);
 
-    final shutdownChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.shutdownTimeout);
+    final shutdownChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.shutdownTimeout,
+    );
 
     final rawShutdown = await shutdownChar.read();
-    final Duration shutdown =
-        Duration(minutes: rawShutdown[0] | (rawShutdown[1] << 8));
+    final Duration shutdown = Duration(
+      minutes: rawShutdown[0] | (rawShutdown[1] << 8),
+    );
 
-    final motionSensChar = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.motionSensitivity);
+    final motionSensChar = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.motionSensitivity,
+    );
 
     final rawMotionSens = await motionSensChar.read();
     final motionSens = rawMotionSens[0];
@@ -426,12 +479,18 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
     ref.read(ironProvider.notifier).setTemp(temp);
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.setTemperature);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.setTemperature,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -445,17 +504,25 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setBoost(int temp) async {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          solderingSettings:
-              state.settings?.solderingSettings.copyWith(boostTemp: temp)),
+        solderingSettings: state.settings?.solderingSettings.copyWith(
+          boostTemp: temp,
+        ),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.boostTemperature);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.boostTemperature,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -467,17 +534,25 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setStartupBehavior(StartupBehavior behavior) async {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          solderingSettings: state.settings?.solderingSettings
-              .copyWith(startUpBehavior: behavior)),
+        solderingSettings: state.settings?.solderingSettings.copyWith(
+          startUpBehavior: behavior,
+        ),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.autoStart);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.autoStart,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -489,18 +564,26 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setTempChangeShort(int value) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          solderingSettings: state.settings?.solderingSettings
-              .copyWith(tempChangeShortPress: value)),
+        solderingSettings: state.settings?.solderingSettings.copyWith(
+          tempChangeShortPress: value,
+        ),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() ==
-        IronCharacteristicUUIDSs.tempChangeShortStep);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() ==
+          IronCharacteristicUUIDSs.tempChangeShortStep,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -512,17 +595,25 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setLockButtons(LockingBehavior behavior) async {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          solderingSettings: state.settings?.solderingSettings
-              .copyWith(allowLockingButtons: behavior)),
+        solderingSettings: state.settings?.solderingSettings.copyWith(
+          allowLockingButtons: behavior,
+        ),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.lockingMode);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.lockingMode,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -534,17 +625,25 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setMotionSensitivity(int sensitivity) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          sleepSettings: state.settings?.sleepSettings
-              .copyWith(motionSenitivity: sensitivity)),
+        sleepSettings: state.settings?.sleepSettings.copyWith(
+          motionSenitivity: sensitivity,
+        ),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.motionSensitivity);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.motionSensitivity,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -556,17 +655,23 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setSleepTemp(int value) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          sleepSettings:
-              state.settings?.sleepSettings.copyWith(sleepTemp: value)),
+        sleepSettings: state.settings?.sleepSettings.copyWith(sleepTemp: value),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.sleepTemperature);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.sleepTemperature,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -578,17 +683,25 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setSleepTimeout(int timout) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          sleepSettings:
-              state.settings?.sleepSettings.copyWith(sleepTimeout: timout)),
+        sleepSettings: state.settings?.sleepSettings.copyWith(
+          sleepTimeout: timout,
+        ),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.sleepTimeout);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.sleepTimeout,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -600,17 +713,25 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setShutdownTimeout(Duration timeout) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          sleepSettings:
-              state.settings?.sleepSettings.copyWith(shutdownTimeout: timeout)),
+        sleepSettings: state.settings?.sleepSettings.copyWith(
+          shutdownTimeout: timeout,
+        ),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.shutdownTimeout);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.shutdownTimeout,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -622,17 +743,25 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setPowerSource(PowerSource source) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          powerSettings:
-              state.settings?.powerSettings.copyWith(dCInCutoff: source)),
+        powerSettings: state.settings?.powerSettings.copyWith(
+          dCInCutoff: source,
+        ),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.dCInCutoff);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.dCInCutoff,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -644,17 +773,23 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setCutoffVol(double val) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          powerSettings:
-              state.settings?.powerSettings.copyWith(minVolCell: val)),
+        powerSettings: state.settings?.powerSettings.copyWith(minVolCell: val),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.minVolCell);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.minVolCell,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -666,17 +801,25 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setQcMaxVoltage(double val) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          powerSettings:
-              state.settings?.powerSettings.copyWith(qCMaxVoltage: val)),
+        powerSettings: state.settings?.powerSettings.copyWith(
+          qCMaxVoltage: val,
+        ),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.qCMaxVoltage);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.qCMaxVoltage,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -688,17 +831,25 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setPdTimeout(Duration timeout) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          powerSettings:
-              state.settings?.powerSettings.copyWith(pdTimeout: timeout)),
+        powerSettings: state.settings?.powerSettings.copyWith(
+          pdTimeout: timeout,
+        ),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.pdNegTimeout);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.pdNegTimeout,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -710,16 +861,23 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setTempUnit(TempUnit unit) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          uiSettings: state.settings?.uiSettings.copyWith(tempUnit: unit)),
+        uiSettings: state.settings?.uiSettings.copyWith(tempUnit: unit),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.temperatureUnit);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.temperatureUnit,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -731,17 +889,25 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setDisplayOrientation(DisplayOrientation orientation) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          uiSettings: state.settings?.uiSettings
-              .copyWith(displayOrientation: orientation)),
+        uiSettings: state.settings?.uiSettings.copyWith(
+          displayOrientation: orientation,
+        ),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.displayRotation);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.displayRotation,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -753,17 +919,25 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setCooldownFlashing(bool value) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          uiSettings:
-              state.settings?.uiSettings.copyWith(cooldownFlashing: value)),
+        uiSettings: state.settings?.uiSettings.copyWith(
+          cooldownFlashing: value,
+        ),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.cooldownBlink);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.cooldownBlink,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -775,17 +949,23 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setScrollingSpeed(ScrollingSpeed speed) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          uiSettings:
-              state.settings?.uiSettings.copyWith(scrollingSpeed: speed)),
+        uiSettings: state.settings?.uiSettings.copyWith(scrollingSpeed: speed),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.scrollingSpeed);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.scrollingSpeed,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -797,18 +977,26 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setSwapButtons(bool value) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          uiSettings:
-              state.settings?.uiSettings.copyWith(swapPlusMinusKeys: value)),
+        uiSettings: state.settings?.uiSettings.copyWith(
+          swapPlusMinusKeys: value,
+        ),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() ==
-        IronCharacteristicUUIDSs.reverseButtonTempChange);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() ==
+          IronCharacteristicUUIDSs.reverseButtonTempChange,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -820,17 +1008,23 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setAnimationSpeed(AnimationSpeed speed) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          uiSettings:
-              state.settings?.uiSettings.copyWith(animationSpeed: speed)),
+        uiSettings: state.settings?.uiSettings.copyWith(animationSpeed: speed),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.animSpeed);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.animSpeed,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -842,17 +1036,25 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setScreenBrightness(int brightness) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          uiSettings: state.settings?.uiSettings
-              .copyWith(screenBrightness: brightness)),
+        uiSettings: state.settings?.uiSettings.copyWith(
+          screenBrightness: brightness,
+        ),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.brightness);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.brightness,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -864,16 +1066,23 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setInvertScreen(bool value) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          uiSettings: state.settings?.uiSettings.copyWith(invertScreen: value)),
+        uiSettings: state.settings?.uiSettings.copyWith(invertScreen: value),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.colourInversion);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.colourInversion,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -885,17 +1094,24 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setBootLogoDuration(int duration) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          uiSettings: state.settings?.uiSettings
-              .copyWith(bootLogoDuration: Duration(seconds: duration))),
+        uiSettings: state.settings?.uiSettings.copyWith(
+          bootLogoDuration: Duration(seconds: duration),
+        ),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.logoTime);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) => element.uuid.toString() == IronCharacteristicUUIDSs.logoTime,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -907,17 +1123,25 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setDetailedIdleScreen(bool value) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          uiSettings:
-              state.settings?.uiSettings.copyWith(detailedIdleScreen: value)),
+        uiSettings: state.settings?.uiSettings.copyWith(
+          detailedIdleScreen: value,
+        ),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.advancedIdle);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.advancedIdle,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -929,17 +1153,25 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setDetailedSolderScreen(bool value) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          uiSettings: state.settings?.uiSettings
-              .copyWith(detailedSolderingScreen: value)),
+        uiSettings: state.settings?.uiSettings.copyWith(
+          detailedSolderingScreen: value,
+        ),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.advancedSoldering);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.advancedSoldering,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -951,17 +1183,25 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setPowerLimit(int limit) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          advancedSettings:
-              state.settings?.advancedSettings.copyWith(powerLimit: limit)),
+        advancedSettings: state.settings?.advancedSettings.copyWith(
+          powerLimit: limit,
+        ),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.powerLimit);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.powerLimit,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -973,17 +1213,25 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setPowerPulse(double power) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          advancedSettings:
-              state.settings?.advancedSettings.copyWith(powerPulse: power)),
+        advancedSettings: state.settings?.advancedSettings.copyWith(
+          powerPulse: power,
+        ),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.powerPulsePower);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.powerPulsePower,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -995,17 +1243,25 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
   Future<void> setPowerPulseDelay(Duration delay) {
     state = state.copyWith(
       settings: state.settings?.copyWith(
-          advancedSettings: state.settings?.advancedSettings
-              .copyWith(powerPulseDelay: delay)),
+        advancedSettings: state.settings?.advancedSettings.copyWith(
+          powerPulseDelay: delay,
+        ),
+      ),
     );
 
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get Characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.powerPulseWait);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.powerPulseWait,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -1016,12 +1272,18 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
 
   Future<void> resetAdvancedSettings() async {
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get Characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.settingsReset);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.settingsReset,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -1030,8 +1292,12 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
     await sendBlePacket(tempCharacteristic, view.buffer.asUint8List(), 0, 3);
   }
 
-  Future<void> sendBlePacket(BluetoothCharacteristic char, Uint8List data,
-      int tries, int maxTries) async {
+  Future<void> sendBlePacket(
+    BluetoothCharacteristic char,
+    Uint8List data,
+    int tries,
+    int maxTries,
+  ) async {
     try {
       await char.write(data, withoutResponse: true);
     } catch (e) {
@@ -1045,12 +1311,18 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
 
   Future<void> saveToFlash() async {
     // Get service
-    final service = ref.read(ironProvider.notifier).services!.firstWhere(
-        (element) => element.uuid.toString() == IronServices.settings);
+    final service = ref
+        .read(ironProvider.notifier)
+        .services!
+        .firstWhere(
+          (element) => element.uuid.toString() == IronServices.settings,
+        );
 
     // Get characteristic
-    final tempCharacteristic = service.characteristics.firstWhere((element) =>
-        element.uuid.toString() == IronCharacteristicUUIDSs.saveToFlash);
+    final tempCharacteristic = service.characteristics.firstWhere(
+      (element) =>
+          element.uuid.toString() == IronCharacteristicUUIDSs.saveToFlash,
+    );
 
     // Write data
     ByteData view = ByteData(2);
@@ -1062,5 +1334,5 @@ class IronSettingsProvider extends StateNotifier<IronSettingsState> {
 
 final ironSettingsProvider =
     StateNotifierProvider<IronSettingsProvider, IronSettingsState>((ref) {
-  return IronSettingsProvider(ref);
-});
+      return IronSettingsProvider(ref);
+    });

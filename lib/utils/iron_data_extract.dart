@@ -12,7 +12,7 @@ IronData extractData(List<int> chars) {
 
   final handleTemp =
       (chars[12] + (chars[13] << 8) + (chars[14] << 16) + (chars[15] << 24)) /
-          10;
+      10;
 
   final pwsAsPwm =
       chars[16] + (chars[17] << 8) + (chars[18] << 16) + (chars[19] << 24);
@@ -25,11 +25,11 @@ IronData extractData(List<int> chars) {
 
   final uptime =
       (chars[28] + (chars[29] << 8) + (chars[30] << 16) + (chars[31] << 24)) /
-          10;
+      10;
 
   final lastMovement =
       (chars[32] + (chars[33] << 8) + (chars[34] << 16) + (chars[35] << 24)) /
-          10;
+      10;
 
   final maxTemp =
       chars[36] + (chars[37] << 8) + (chars[38] << 16) + (chars[39] << 24);
@@ -45,7 +45,7 @@ IronData extractData(List<int> chars) {
 
   final watts =
       (chars[52] + (chars[53] << 8) + (chars[54] << 16) + (chars[55] << 24)) /
-          10;
+      10;
 
   final ironData = IronData(
     currentTemp: temp,

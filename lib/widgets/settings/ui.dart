@@ -16,8 +16,11 @@ class _UISettingsTileState extends ConsumerState<UISettingsTile> {
   void initState() {
     super.initState();
 
-    brightnessValue =
-        ref.read(ironSettingsProvider).settings!.uiSettings.screenBrightness;
+    brightnessValue = ref
+        .read(ironSettingsProvider)
+        .settings!
+        .uiSettings
+        .screenBrightness;
     logoDurationValue = ref
         .read(ironSettingsProvider)
         .settings!
@@ -38,10 +41,7 @@ class _UISettingsTileState extends ConsumerState<UISettingsTile> {
       title: const Text("User Interface"),
       subtitle: const Text("On-device settings for the user interface"),
       expandedCrossAxisAlignment: CrossAxisAlignment.start,
-      childrenPadding: const EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 10,
-      ),
+      childrenPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       children: [
         const Text("Temperature Unit"),
         RadioListTile<TempUnit>(
