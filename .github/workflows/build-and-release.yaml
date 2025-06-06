@@ -14,12 +14,14 @@ jobs:
     name: Build
     runs-on: macos-latest
 
-    uses: ./.github/workflows/set-up.yaml
-
     steps:
+      - name: Set-up environment
+        uses: ./.github/shared/set-up
+
       - name: Decode keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        shell: bash
         run: |
           echo "${KEYSTORE_BASE64}" | base64 --decode > android/keystore.jks
 
@@ -28,6 +30,7 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        shell: bash
         run: |
           echo "storePassword=${KEYSTORE_PASSWORD}" > android/key.properties
           echo "keyPassword=${KEY_PASSWORD}" >> android/key.properties
@@ -70,6 +73,7 @@ jobs:
 
       - name: Extract version
         id: extract-version
+        shell: bash
         run: echo "$(grep -oP 'version:\s*\K[0-9.]+(-\w+)?' pubspec.yaml)" >> $GITHUB_OUTPUT
 
       - name: Download artifacts
@@ -83,6 +87,7 @@ jobs:
         env:
           VERSION: ${{ steps.extract-version.outputs.result }}
           ARTIFACTS_PATH: ${{ steps.download-artifacts.outputs.download-path }}
+        shell: bash
         run: |
           gh release create "v${VERSION}" \
             --generate-notes \

@@ -9,28 +9,37 @@ jobs:
     name: Analyze
     runs-on: macos-latest
 
-    uses: ./.github/workflows/set-up.yaml
-
     steps:
+      - name: Set up environment
+        uses: ./.github/shared/set-up
+
       - name: Analyze code
+        shell: bash
         run: flutter analyze
 
   test:
     name: Test
     runs-on: macos-latest
 
-    uses: ./.github/workflows/set-up.yaml
-
     steps:
+      - name: Set up environment
+        uses: ./.github/shared/set-up
+
       - name: Run tests
+        shell: bash
         run: flutter test --coverage
 
   format:
     name: Format
     runs-on: macos-latest
 
-    uses: ./.github/workflows/set-up.yaml
-
     steps:
+      - name: Set up environment
+        uses: ./.github/shared/set-up
+
+      - name: Set up formatting tools
+        shell: bash
+        run: dart run scripts/setup.dart
+
       - name: Check formatting
-        run: flutter format --set-exit-if-changed .
+        uses: dprint/check@v2.2

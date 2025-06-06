@@ -1,0 +1,34 @@
+name: Shared set-up workflow
+description: >-
+  This workflow sets up the environment for the project,
+  including Java and Flutter, and installs dependencies.
+
+runs:
+  using: composite
+
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: temurin
+        java-version: 17
+        cache: gradle
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: stable
+        cache: true
+
+    - name: Disable analytics
+      shell: bash
+      run: |
+        dart --disable-analytics
+        flutter config --no-analytics
+
+    - name: Install dependencies
+      shell: bash
+      run: flutter pub get
