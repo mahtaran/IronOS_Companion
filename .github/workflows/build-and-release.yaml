@@ -76,7 +76,7 @@ jobs:
       - name: Extract version
         id: extract-version
         shell: bash
-        run: echo "$(grep -oP 'version:\s*\K[0-9.]+(-\w+)?' pubspec.yaml)" >> $GITHUB_OUTPUT
+        run: echo "version=$(grep -oP 'version:\s*\K[0-9.]+(-\w+)?' pubspec.yaml)" >> $GITHUB_OUTPUT
 
       - name: Download artifacts
         id: download-artifacts
@@ -87,7 +87,7 @@ jobs:
 
       - name: Create release
         env:
-          VERSION: ${{ steps.extract-version.outputs.result }}
+          VERSION: ${{ steps.extract-version.outputs.version }}
           ARTIFACTS_PATH: ${{ steps.download-artifacts.outputs.download-path }}
         shell: bash
         run: |
