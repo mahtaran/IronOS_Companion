@@ -1,4 +1,4 @@
-name: Build
+name: Build and release
 
 on:
   pull_request:
@@ -18,7 +18,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Set-up environment
+      - name: Set up environment
         uses: ./.github/shared/set-up
 
       - name: Decode keystore
@@ -39,23 +39,39 @@ jobs:
           echo "keyPassword=${KEY_PASSWORD}" >> android/key.properties
           echo "keyAlias=${KEY_ALIAS}" >> android/key.properties
 
+      - name: Create artifacts output directory
+        id: artifacts
+        shell: bash
+        run: |
+          output="${{ runner.temp }}/artifacts"
+          mkdir -p "$output"
+          echo "prefix=$output/ironos-companion" >> $GITHUB_OUTPUT
+
       - name: Build APK
-        run: flutter build apk
+        shell: bash
+        run: |
+          flutter build apk
+          mv build/app/outputs/flutter-apk/app-release.apk ${{ steps.artifacts.outputs.prefix }}.apk
 
       - name: Build app bundle
-        run: flutter build appbundle
+        shell: bash
+        run: |
+          flutter build appbundle
+          mv build/app/outputs/bundle/release/app-release.aab ${{ steps.artifacts.outputs.prefix }}.aab
 
       - name: Build IPA
-        run: flutter build ios --no-codesign
+        shell: bash
+        run: |
+          flutter build ios --no-codesign
+          tar -czf ${{ steps.artifacts.outputs.prefix }}.app.tar.gz -C build/ios/iphoneos/Runner.app
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts
-          path: |
-            build/app/outputs/flutter-apk/app-release.apk
-            build/app/outputs/bundle/release/app-release.aab
-            build/ios/iphoneos/Runner.app
+          name: release-artifacts
+          path: ${{ steps.artifacts.outputs.prefix }}.*
+          if-no-files-found: error
+
   release:
     name: Release
     runs-on: ubuntu-latest
@@ -82,16 +98,14 @@ jobs:
         id: download-artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-artifacts
-          path: build/
+          name: release-artifacts
+          path: ${{ runner.temp }}/artifacts
 
       - name: Create release
         env:
           GH_TOKEN: ${{ github.token }}
-          VERSION: ${{ steps.extract-version.outputs.version }}
-          ARTIFACTS_PATH: ${{ steps.download-artifacts.outputs.download-path }}
         shell: bash
         run: |
-          gh release create "v${VERSION}" \
+          gh release create "v${{ steps.extract-version.outputs.version }}" \
             --generate-notes \
-            "${ARTIFACTS_PATH}/*"
+            "${{ steps.download-artifacts.outputs.download-path }}/*"
