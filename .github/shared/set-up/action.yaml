@@ -18,6 +18,35 @@ runs:
           echo "Warning: ANDROID_NDK_LATEST_HOME not set, skipping NDK configuration"
         fi
 
+    - name: Calculate Android cache configuration
+      id: android-cache-config
+      shell: bash
+      run: |
+        if [[ -z "$ANDROID_HOME" || ! -d "$ANDROID_HOME/ndk" || ! -d "$ANDROID_HOME/cmake" ]]; then
+          echo "No Android tools available for caching, skipping"
+          echo "cache=false" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+
+        inclusions=("$ANDROID_HOME/ndk" "$ANDROID_HOME/cmake")
+        exclusions=($(find "${inclusions[@]}" -mindepth 1 -maxdepth 1 -type d -exec printf '!%s\n' {} +))
+        path=$(printf '%s\n' "${inclusions[@]}" "${exclusions[@]}")
+
+        {
+          echo "path<<EOF"
+          echo "$path"
+          echo "EOF"
+          echo "hash=$(printf '%s' "$path" | shasum -a 256 | cut -d ' ' -f 1)"
+          echo "cache=true"
+        } >> $GITHUB_OUTPUT
+
+    - name: Cache Android tools
+      if: steps.android-cache-config.outputs.cache == 'true'
+      uses: actions/cache@v4
+      with:
+        key: android-${{ runner.os }}-${{ steps.android-cache-config.outputs.hash }}
+        path: ${{ steps.android-cache-config.outputs.path }}
+
     - name: Set up Java
       uses: actions/setup-java@v4
       with:
