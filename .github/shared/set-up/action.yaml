@@ -44,7 +44,7 @@ runs:
       if: steps.android-cache-config.outputs.cache == 'true'
       uses: actions/cache@v4
       with:
-        key: android-${{ runner.os }}-${{ steps.android-cache-config.outputs.hash }}
+        key: android-${{ runner.os }}-${{ runner.arch }}-${{ steps.android-cache-config.outputs.hash }}
         path: ${{ steps.android-cache-config.outputs.path }}
 
     - name: Set up Java
