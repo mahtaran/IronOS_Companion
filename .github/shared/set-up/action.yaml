@@ -7,8 +7,19 @@ runs:
   using: composite
 
   steps:
+    - name: Configure Android NDK version
+      shell: bash
+      run: |
+        if [[ -n "$ANDROID_NDK_LATEST_HOME" ]]; then
+          ndkVersion=$(basename "$ANDROID_NDK_LATEST_HOME")
+          echo "Using NDK version: $ndkVersion"
+          find . -type f -name "*.gradle*" -exec sed -i '' 's/flutter\.ndkVersion/"'"$ndkVersion"'"/g' {} +
+        else
+          echo "Warning: ANDROID_NDK_LATEST_HOME not set, skipping NDK configuration"
+        fi
+
     - name: Set up Java
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: temurin
         java-version: 17
@@ -20,12 +31,12 @@ runs:
         channel: stable
         cache: true
 
-    - name: Disable analytics
+    - name: Configure Flutter
       shell: bash
       run: |
         dart --disable-analytics
-        flutter config --no-analytics
+        flutter config --no-analytics --no-cli-animations
 
-    - name: Install dependencies
+    - name: Install Flutter dependencies
       shell: bash
       run: flutter pub get
