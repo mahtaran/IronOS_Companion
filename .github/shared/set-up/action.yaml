@@ -36,7 +36,7 @@ runs:
           exit 0
         fi
 
-        inclusions=("$ANDROID_HOME/ndk" "$ANDROID_HOME/cmake")
+        inclusions=("$ANDROID_HOME/cmake" "$ANDROID_HOME/ndk" "$ANDROID_HOME/platforms")
         exclusions=($(find "${inclusions[@]}" -mindepth 1 -maxdepth 1 -type d))
         path=$(printf '%s/*\n' "${inclusions[@]}"; printf '!%s\n' "${exclusions[@]}")
 
