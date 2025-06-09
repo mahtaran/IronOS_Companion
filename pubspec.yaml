@@ -40,7 +40,7 @@ dependencies:
   animations: ^2.0.7
   rive: ^0.13.20
   flutter_blue_plus: ^1.12.11
-  permission_handler: ^11.1.0
+  permission_handler: ^12.0.0+1
   fl_chart: ^1.0.0
   hive_flutter: ^1.1.0
   sleek_circular_slider: ^2.0.1
@@ -57,6 +57,7 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.6
 
   args: ^2.7.0
   crypto: ^3.0.6
@@ -108,3 +109,16 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_launcher_icons:
+  image_path: assets/icon/icon.png
+  android: true
+  min_sdk_android: 21
+  adaptive_icon_background: assets/icon/background.png
+  adaptive_icon_foreground: assets/icon/foreground.png
+  ios: true
+  remove_alpha_ios: true
+
+flutter_native_splash:
+  background_image: assets/icon/background.png
+  image: assets/icon/foreground.png
