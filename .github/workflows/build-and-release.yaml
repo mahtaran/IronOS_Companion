@@ -10,9 +10,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build
-    runs-on: macos-latest
+  build-android:
+    name: Build Android artifacts
+    runs-on: ubuntu-latest
 
     steps:
       - name: Check out repository
@@ -26,7 +26,7 @@ jobs:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         shell: bash
         run: |
-          echo "${KEYSTORE_BASE64}" | base64 --decode > android/keystore.jks
+          echo "$KEYSTORE_BASE64" | base64 --decode > android/keystore.jks
 
       - name: Create key.properties
         env:
@@ -35,41 +35,57 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         shell: bash
         run: |
-          echo "storePassword=${KEYSTORE_PASSWORD}" > android/key.properties
-          echo "keyPassword=${KEY_PASSWORD}" >> android/key.properties
-          echo "keyAlias=${KEY_ALIAS}" >> android/key.properties
-
-      - name: Create artifacts output directory
-        id: artifacts
-        shell: bash
-        run: |
-          output="${{ runner.temp }}/artifacts"
-          mkdir -p "$output"
-          echo "prefix=$output/ironos-companion" >> $GITHUB_OUTPUT
+          echo "storePassword=$KEYSTORE_PASSWORD" > android/key.properties
+          echo "keyPassword=$KEY_PASSWORD" >> android/key.properties
+          echo "keyAlias=$KEY_ALIAS" >> android/key.properties
 
       - name: Build APK
         shell: bash
-        run: |
-          flutter build apk
-          mv build/app/outputs/flutter-apk/app-release.apk ${{ steps.artifacts.outputs.prefix }}.apk
+        run: flutter build apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
 
       - name: Build app bundle
         shell: bash
-        run: |
-          flutter build appbundle
-          mv build/app/outputs/bundle/release/app-release.aab ${{ steps.artifacts.outputs.prefix }}.aab
+        run: flutter build appbundle
+
+      - name: Upload app bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-aab
+          path: build/app/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+
+  build-ios:
+    name: Build iOS artifacts
+    runs-on: macos-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up environment
+        uses: ./.github/shared/set-up
+        with:
+          android: false
 
       - name: Build IPA
         shell: bash
         run: |
-          flutter build ios --no-codesign
-          tar -czf ${{ steps.artifacts.outputs.prefix }}.app.tar.gz -C build/ios/iphoneos/Runner.app
+          flutter build ipa --no-codesign
+          cd build/ios/archive
+          tar -czf app-release.xcarchive.tar.gz Runner.xcarchive
 
-      - name: Upload artifacts
+      - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
-          name: release-artifacts
-          path: ${{ steps.artifacts.outputs.prefix }}.*
+          name: ios-ipa
+          path: build/ios/archive/app-release.xcarchive.tar.gz
           if-no-files-found: error
 
   release:
@@ -77,7 +93,9 @@ jobs:
     runs-on: ubuntu-latest
 
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: build
+    needs:
+      - build-android
+      - build-ios
     environment: release
     permissions:
       contents: write
@@ -98,8 +116,8 @@ jobs:
         id: download-artifacts
         uses: actions/download-artifact@v4
         with:
-          name: release-artifacts
           path: ${{ runner.temp }}/artifacts
+          merge-multiple: true
 
       - name: Create release
         env:

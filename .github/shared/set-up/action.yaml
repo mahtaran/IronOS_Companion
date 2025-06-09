@@ -3,23 +3,31 @@ description: >-
   This workflow sets up the environment for the project,
   including Java and Flutter, and installs dependencies.
 
+inputs:
+  android:
+    description: "Configure Android tools and cache"
+    required: false
+    default: "true"
+
 runs:
   using: composite
 
   steps:
     - name: Configure Android NDK version
+      if: inputs.android == 'true'
       shell: bash
       run: |
         if [[ -n "$ANDROID_NDK_LATEST_HOME" ]]; then
           ndkVersion=$(basename "$ANDROID_NDK_LATEST_HOME")
           echo "Using NDK version: $ndkVersion"
-          find . -type f -name "*.gradle*" -exec sed -i '' 's/flutter\.ndkVersion/"'"$ndkVersion"'"/g' {} +
+          find . -type f -name "*.gradle*" -exec sed -i.bak 's/flutter\.ndkVersion/"'"$ndkVersion"'"/g' {} +
         else
           echo "Warning: ANDROID_NDK_LATEST_HOME not set, skipping NDK configuration"
         fi
 
     - name: Calculate Android cache configuration
       id: android-cache-config
+      if: inputs.android == 'true'
       shell: bash
       run: |
         if [[ -z "$ANDROID_HOME" || ! -d "$ANDROID_HOME/ndk" || ! -d "$ANDROID_HOME/cmake" ]]; then
@@ -41,13 +49,14 @@ runs:
         } >> $GITHUB_OUTPUT
 
     - name: Cache Android tools
-      if: steps.android-cache-config.outputs.cache == 'true'
+      if: inputs.android == 'true' && steps.android-cache-config.outputs.cache == 'true'
       uses: actions/cache@v4
       with:
         key: android-${{ runner.os }}-${{ runner.arch }}-${{ steps.android-cache-config.outputs.hash }}
         path: ${{ steps.android-cache-config.outputs.path }}
 
     - name: Set up Java
+      if: inputs.android == 'true'
       uses: actions/setup-java@v4
       with:
         distribution: temurin
